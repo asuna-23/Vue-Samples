@@ -1,0 +1,79 @@
+// table
+
+<template>
+  <div class="card bg-secondary text-white p-4">
+    <table class="table table-borderless text-white text-center">
+      <thead>
+        <tr>
+          <th v-for="(header, index) in headers" :key="index" class="py-3" :colspan="header.colspan">
+            {{ header.title }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(row, index) in tableData" :key="index">
+          <td v-for="(cell, cellIndex) in row" :key="cellIndex" class="py-3 px-4">
+            {{ cell.text }} <br> 
+            <small class="text-muted">{{ cell.title }}</small>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</template>
+
+<script>
+export default {
+  props: {
+    headers: {
+      type: Array,
+      required: true,
+    },
+    tableData: {
+      type: Array,
+      required: true,
+    },
+  },
+};
+</script>
+
+
+/// 
+
+<template>
+  <div>
+    <ConsumptionTable :headers="headers" :tableData="consumptionData" />
+  </div>
+</template>
+
+<script>
+import ConsumptionTable from "@/components/ConsumptionTable.vue";
+
+export default {
+  components: {
+    ConsumptionTable,
+  },
+  data() {
+    return {
+      headers: [
+        { title: "Daily Consumption", colspan: 2 },
+        { title: "Monthly Consumption", colspan: 2 },
+      ],
+      consumptionData: [
+        [
+          { text: "text1", title: "title here" },
+          { text: "text2", title: "title here" },
+          { text: "text3", title: "title here" },
+          { text: "text4", title: "title here" },
+        ],
+        [
+          { text: "text5", title: "title here" },
+          { text: "text6", title: "title here" },
+          { text: "text7", title: "title here" },
+          { text: "text8", title: "title here" },
+        ],
+      ],
+    };
+  },
+};
+</script>
