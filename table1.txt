@@ -1,0 +1,41 @@
+<template>
+  <div class="card bg-secondary text-white p-4">
+    <table class="table table-borderless text-white text-center">
+      <thead>
+        <tr>
+          <th class="py-3" colspan="2">Daily Consumption</th>
+          <th class="py-3" colspan="2">Monthly Consumption</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(row, index) in consumptionData" :key="index">
+          <!-- Daily Consumption -->
+          <td class="py-3 px-4">{{ row.daily.text1 }} <br> <small class="text-muted">{{ row.daily.title1 }}</small></td>
+          <td class="py-3 px-4">{{ row.daily.text2 }} <br> <small class="text-muted">{{ row.daily.title2 }}</small></td>
+          <!-- Monthly Consumption -->
+          <td class="py-3 px-4">{{ row.monthly.text1 }} <br> <small class="text-muted">{{ row.monthly.title1 }}</small></td>
+          <td class="py-3 px-4">{{ row.monthly.text2 }} <br> <small class="text-muted">{{ row.monthly.title2 }}</small></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      consumptionData: [
+        { 
+          daily: { text1: "text1", title1: "title here", text2: "text2", title2: "title here" }, 
+          monthly: { text1: "text3", title1: "title here", text2: "text4", title2: "title here" } 
+        },
+        { 
+          daily: { text1: "text5", title1: "title here", text2: "text6", title2: "title here" }, 
+          monthly: { text1: "text7", title1: "title here", text2: "text8", title2: "title here" } 
+        }
+      ],
+    };
+  },
+};
+</script>
