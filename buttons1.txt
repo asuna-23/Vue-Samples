@@ -1,0 +1,391 @@
+/// 1
+
+<template>
+  <div class="gradient-button-row">
+    <b-button class="btn-gradient electricity">⚡ Electricity</b-button>
+    <b-button class="btn-gradient air">💨 Compressed Air Dry</b-button>
+    <b-button class="btn-gradient nitrogen">🧪 Nitrogen</b-button>
+    <b-button class="btn-gradient water">💦 Water</b-button>
+  </div>
+</template>
+
+<style scoped>
+.gradient-button-row {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  padding: 20px;
+}
+
+.btn-gradient {
+  font-size: 16px;
+  font-weight: bold;
+  padding: 12px 20px;
+  border-radius: 50px;
+  color: white;
+  border: none;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.electricity {
+  background: linear-gradient(45deg, #FFD700, #FFA500);
+}
+
+.air {
+  background: linear-gradient(45deg, #007BFF, #0056b3);
+}
+
+.nitrogen {
+  background: linear-gradient(45deg, #28A745, #218838);
+}
+
+.water {
+  background: linear-gradient(45deg, #17A2B8, #117a8b);
+}
+</style>
+
+
+/// 2
+
+<template>
+  <div class="button-row">
+    <b-button variant="warning" class="btn-custom">
+      ⚡ Electricity
+    </b-button>
+    <b-button variant="primary" class="btn-custom">
+      💨 Compressed Air Dry
+    </b-button>
+    <b-button variant="success" class="btn-custom">
+      🧪 Nitrogen
+    </b-button>
+    <b-button variant="info" class="btn-custom">
+      💦 Water
+    </b-button>
+  </div>
+</template>
+
+<style scoped>
+.button-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  padding: 20px;
+}
+
+.btn-custom {
+  font-size: 16px;
+  font-weight: bold;
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.15);
+}
+</style>
+
+
+///////////// 3 
+
+<template>
+  <div class="button-container">
+    <b-button class="btn-utility electricity">⚡ Electricity</b-button>
+    <b-button class="btn-utility air">💨 Compressed Air Dry</b-button>
+    <b-button class="btn-utility nitrogen">🧪 Nitrogen</b-button>
+    <b-button class="btn-utility water">💦 Water</b-button>
+  </div>
+</template>
+
+<style scoped>
+.button-container {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  padding: 20px;
+}
+
+.btn-utility {
+  font-size: 18px;
+  font-weight: 600;
+  padding: 14px 24px;
+  border-radius: 8px;
+  color: white;
+  border: none;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.electricity {
+  background-color: #FFC107; /* Yellow */
+}
+
+.air {
+  background-color: #007BFF; /* Blue */
+}
+
+.nitrogen {
+  background-color: #28A745; /* Green */
+}
+
+.water {
+  background-color: #17A2B8; /* Cyan */
+}
+
+/* Hover Effects */
+.btn-utility:hover {
+  transform: translateY(-2px);
+  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Active Effect */
+.btn-utility:active {
+  transform: scale(0.98);
+  box-shadow: inset 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+</style>
+
+
+
+----------------------------------------
+
+<template>
+  <div class="button-container">
+    <b-button variant="outline-dark" class="icon-button">
+      <AirCompressorIcon />
+      <span>Compressed Air</span>
+    </b-button>
+
+    <b-button variant="outline-dark" class="icon-button">
+      <NitrogenIcon />
+      <span>Nitrogen</span>
+    </b-button>
+
+    <b-button variant="outline-dark" class="icon-button">
+      ⚡ Electricity
+    </b-button>
+
+    <b-button variant="outline-dark" class="icon-button">
+      💧 Water
+    </b-button>
+  </div>
+</template>
+
+<script>
+import AirCompressorIcon from "@/components/AirCompressorIcon.vue";
+import NitrogenIcon from "@/components/NitrogenIcon.vue";
+
+export default {
+  components: { AirCompressorIcon, NitrogenIcon },
+};
+</script>
+
+<style scoped>
+.button-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.icon-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 120px;
+  font-weight: bold;
+  text-align: center;
+}
+</style>
+
+
+///////////////// bottom border
+
+<template>
+  <div class="button-container">
+    <b-button class="btn-utility electricity">
+      <span class="btn-icon">⚡</span> Electricity
+    </b-button>
+    <b-button class="btn-utility air">
+      <span class="btn-icon">💨</span> Compressed Air Dry
+    </b-button>
+    <b-button class="btn-utility nitrogen">
+      <span class="btn-icon">🧪</span> Nitrogen
+    </b-button>
+    <b-button class="btn-utility water">
+      <span class="btn-icon">💦</span> Water
+    </b-button>
+  </div>
+</template>
+
+<style scoped>
+.button-container {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  padding: 20px;
+  flex-wrap: wrap; /* Allows buttons to wrap on smaller screens */
+}
+
+.btn-utility {
+  font-family: 'Arial', sans-serif; /* Clean, professional font */
+  font-size: 14px; /* Slightly smaller for a corporate feel */
+  font-weight: 500; /* Medium weight for a balanced look */
+  padding: 10px 20px;
+  border-radius: 4px; /* Subtle rounded corners */
+  color: #FFC107; /* Yellow color for text */
+  background-color: transparent; /* Transparent background */
+  border: none; /* No border by default */
+  border-bottom: 2px solid transparent; /* Only bottom border */
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Consistent gap between icon and text */
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle box shadow */
+}
+
+.electricity {
+  border-bottom-color: #FFC107; /* Yellow bottom border for Electricity */
+}
+
+.air {
+  border-bottom-color: #FFCA28; /* Lighter yellow bottom border for Air */
+}
+
+.nitrogen {
+  border-bottom-color: #FFB300; /* Golden yellow bottom border for Nitrogen */
+}
+
+.water {
+  border-bottom-color: #FF9800; /* Darker yellow bottom border for Water */
+}
+
+/* Hover Effect */
+.btn-utility:hover {
+  background-color: #FFC107; /* Add yellow background on hover */
+  color: white; /* Change text color to white on hover */
+  border-bottom-color: #FF9800; /* Darker yellow bottom border on hover */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* Increase shadow on hover */
+}
+
+/* Active Effect */
+.btn-utility:active {
+  background-color: #FF9800; /* Darker yellow background when active */
+  color: white; /* White text on active */
+  transform: scale(0.98); /* Slightly reduce size for an active feel */
+  border-bottom-color: #FF9800; /* Matching darker bottom border on active */
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15); /* Inner shadow on active */
+}
+
+/* Focus Effect for Accessibility */
+.btn-utility:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.5); /* Subtle yellow focus ring */
+}
+
+/* Icon styling */
+.btn-icon {
+  font-size: 18px; /* Consistent icon size */
+}
+
+/* Responsive Design */
+@media (max-width: 576px) {
+  .button-container {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+</style>
+
+
+//////////// outline
+
+<template>
+  <div class="button-container">
+    <b-button class="btn-utility electricity">
+      <span class="btn-icon">⚡</span> Electricity
+    </b-button>
+    <b-button class="btn-utility air">
+      <span class="btn-icon">💨</span> Compressed Air Dry
+    </b-button>
+    <b-button class="btn-utility nitrogen">
+      <span class="btn-icon">🧪</span> Nitrogen
+    </b-button>
+    <b-button class="btn-utility water">
+      <span class="btn-icon">💦</span> Water
+    </b-button>
+  </div>
+</template>
+
+<style scoped>
+.button-container {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  padding: 20px;
+  flex-wrap: wrap; /* Allows buttons to wrap on smaller screens */
+}
+
+.btn-utility {
+  font-family: 'Arial', sans-serif; /* Clean, professional font */
+  font-size: 14px; /* Slightly smaller for a corporate feel */
+  font-weight: 500; /* Medium weight for a balanced look */
+  padding: 10px 20px;
+  border-radius: 4px; /* Subtle rounded corners */
+  color: #FFC107; /* Yellow color for text */
+  border: 2px solid transparent; /* Transparent border by default */
+  background-color: transparent; /* Transparent background */
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Consistent gap between icon and text */
+  transition: all 0.2s ease-in-out;
+}
+
+.electricity {
+  border-color: #FFC107; /* Yellow border for Electricity */
+}
+
+.air {
+  border-color: #FFCA28; /* Lighter yellow border for Air */
+}
+
+.nitrogen {
+  border-color: #FFB300; /* Golden yellow border for Nitrogen */
+}
+
+.water {
+  border-color: #FF9800; /* Darker yellow border for Water */
+}
+
+/* Hover Effect */
+.btn-utility:hover {
+  background-color: #FFC107; /* Add yellow background on hover */
+  color: white; /* Change text color to white on hover */
+  border-color: #FF9800; /* Add darker yellow border on hover */
+}
+
+/* Active Effect */
+.btn-utility:active {
+  background-color: #FF9800; /* Darker yellow background when active */
+  color: white; /* White text on active */
+  transform: scale(0.98); /* Slightly reduce size for an active feel */
+  border-color: #FF9800; /* Matching border color on active */
+}
+
+/* Focus Effect for Accessibility */
+.btn-utility:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.5); /* Subtle yellow focus ring */
+}
+
+/* Icon styling */
+.btn-icon {
+  font-size: 18px; /* Consistent icon size */
+}
+
+/* Responsive Design */
+@media (max-width: 576px) {
+  .button-container {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+</style>
