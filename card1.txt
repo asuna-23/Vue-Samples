@@ -1,0 +1,330 @@
+<template>
+  <b-card class="text-center p-3">
+    <h5>Hourly</h5>
+    <div class="mt-3">
+      <h4 class="font-weight-bold">{{ actualValue }} kWh</h4>
+      <p>Actual Hourly</p>
+    </div>
+    <div class="mt-3">
+      <h4 class="font-weight-bold">{{ targetValue }} kWh</h4>
+      <p>Target Hourly</p>
+    </div>
+  </b-card>
+</template>
+
+<script>
+export default {
+  props: {
+    actualValue: {
+      type: Number,
+      required: true
+    },
+    targetValue: {
+      type: Number,
+      required: true
+    }
+  }
+};
+</script>
+
+<style scoped>
+h4 {
+  font-weight: bold;
+}
+</style>
+
+
+////
+
+<template>
+  <b-card class="text-center card-container">
+    <h5 class="card-title">Hourly</h5>
+    <div class="data-section">
+      <h4 class="font-weight-bold">{{ actualValue }} kWh</h4>
+      <p class="text-muted">Actual Hourly</p>
+    </div>
+    <div class="data-section">
+      <h4 class="font-weight-bold">{{ targetValue }} kWh</h4>
+      <p class="text-muted">Target Hourly</p>
+    </div>
+  </b-card>
+</template>
+
+<script>
+export default {
+  props: {
+    actualValue: {
+      type: Number,
+      required: true
+    },
+    targetValue: {
+      type: Number,
+      required: true
+    }
+  }
+};
+</script>
+
+<style scoped>
+.card-container {
+  max-width: 300px;
+  margin: auto;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+  font-weight: bold;
+}
+
+.data-section {
+  margin-top: 15px;
+}
+</style>
+
+
+//////////////
+
+export default {
+  title: "Hourly",
+  values: {
+    actual: {
+      label: "Actual Hourly",
+      value: 20845,
+      unit: "kWh",
+    },
+    target: {
+      label: "Target Hourly",
+      value: 30540,
+      unit: "kWh",
+    }
+  }
+};
+
+
+<script>
+import HourlyCard from "@/components/HourlyCard.vue";
+import hourlyCardRecipe from "@/assets/hourlyCardRecipe.js";
+
+export default {
+  components: {
+    HourlyCard
+  },
+  data() {
+    return {
+      defaultRecipe: hourlyCardRecipe,
+      customRecipe: {
+        title: "Custom Hourly",
+        values: {
+          actual: { value: 25000, unit: "kWh" },
+          target: { value: 32000, unit: "kWh" }
+        }
+      }
+    };
+  }
+};
+</script>
+
+<template>
+  <div>
+    <!-- Default Recipe (No Props) -->
+    <HourlyCard />
+
+    <!-- Custom Recipe (Overrides Default) -->
+    <HourlyCard :recipe="customRecipe" />
+  </div>
+</template>
+
+
+
+///// -----------
+
+export default {
+  hourly: {
+    title: "Hourly",
+    values: {
+      actual: { label: "Actual Hourly", value: 20845, unit: "kWh" },
+      target: { label: "Target Hourly", value: 30540, unit: "kWh" }
+    }
+  },
+  daily: {
+    title: "Daily",
+    values: {
+      actual: { label: "Actual Daily", value: 500000, unit: "kWh" },
+      target: { label: "Target Daily", value: 650000, unit: "kWh" }
+    }
+  },
+  monthly: {
+    title: "Monthly",
+    values: {
+      actual: { label: "Actual Monthly", value: 15000000, unit: "kWh" },
+      target: { label: "Target Monthly", value: 18000000, unit: "kWh" }
+    }
+  },
+  yearly: {
+    title: "Yearly",
+    values: {
+      actual: { label: "Actual Yearly", value: 200000000, unit: "kWh" },
+      target: { label: "Target Yearly", value: 250000000, unit: "kWh" }
+    }
+  }
+};
+
+
+<template>
+  <b-card class="text-center card-container">
+    <h5 class="card-title">{{ mergedRecipe.title }}</h5>
+    <div class="data-section">
+      <h4 class="font-weight-bold">
+        {{ mergedRecipe.values.actual.value }} {{ mergedRecipe.values.actual.unit }}
+      </h4>
+      <p class="text-muted">{{ mergedRecipe.values.actual.label }}</p>
+    </div>
+    <div class="data-section">
+      <h4 class="font-weight-bold">
+        {{ mergedRecipe.values.target.value }} {{ mergedRecipe.values.target.unit }}
+      </h4>
+      <p class="text-muted">{{ mergedRecipe.values.target.label }}</p>
+    </div>
+  </b-card>
+</template>
+
+<script>
+import timeFrameRecipes from "@/assets/timeFrameRecipes.js";
+
+export default {
+  props: {
+    recipe: {
+      type: Object,
+      default: () => ({}) // Accepts dynamic values
+    }
+  },
+  computed: {
+    mergedRecipe() {
+      return {
+        ...timeFrameRecipes.hourly, // Default to hourly if no prop is given
+        ...this.recipe,
+        values: {
+          actual: { ...timeFrameRecipes.hourly.values.actual, ...this.recipe.values?.actual },
+          target: { ...timeFrameRecipes.hourly.values.target, ...this.recipe.values?.target }
+        }
+      };
+    }
+  }
+};
+</script>
+
+<style scoped>
+.card-container {
+  max-width: 300px;
+  margin: auto;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+  font-weight: bold;
+}
+
+.data-section {
+  margin-top: 15px;
+}
+</style>
+
+
+--
+
+<script>
+import HourlyCard from "@/components/HourlyCard.vue";
+import timeFrameRecipes from "@/assets/timeFrameRecipes.js";
+
+export default {
+  components: {
+    HourlyCard
+  },
+  data() {
+    return {
+      timeFrameRecipes
+    };
+  }
+};
+</script>
+
+<template>
+  <div class="grid-container">
+    <HourlyCard :recipe="timeFrameRecipes.hourly" />
+    <HourlyCard :recipe="timeFrameRecipes.daily" />
+    <HourlyCard :recipe="timeFrameRecipes.monthly" />
+    <HourlyCard :recipe="timeFrameRecipes.yearly" />
+  </div>
+</template>
+
+<style scoped>
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  justify-content: center;
+  padding: 20px;
+}
+</style>
+
+
+<template>
+  <b-card class="text-center card-container">
+    <h5 class="card-title">{{ mergedRecipe.title }}</h5>
+    <div class="data-section">
+      <h4 class="font-weight-bold">{{ mergedRecipe.values.actual.value }} {{ mergedRecipe.values.actual.unit }}</h4>
+      <p class="text-muted">{{ mergedRecipe.values.actual.label }}</p>
+    </div>
+    <div class="data-section">
+      <h4 class="font-weight-bold">{{ mergedRecipe.values.target.value }} {{ mergedRecipe.values.target.unit }}</h4>
+      <p class="text-muted">{{ mergedRecipe.values.target.label }}</p>
+    </div>
+  </b-card>
+</template>
+
+<script>
+import defaultRecipe from "@/assets/hourlyCardRecipe.js";
+
+export default {
+  props: {
+    recipe: {
+      type: Object,
+      default: () => ({}) // Allows passing a partial object
+    }
+  },
+  computed: {
+    mergedRecipe() {
+      return {
+        ...defaultRecipe,
+        ...this.recipe,
+        values: {
+          actual: { ...defaultRecipe.values.actual, ...this.recipe.values?.actual },
+          target: { ...defaultRecipe.values.target, ...this.recipe.values?.target }
+        }
+      };
+    }
+  }
+};
+</script>
+
+<style scoped>
+.card-container {
+  max-width: 300px;
+  margin: auto;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+  font-weight: bold;
+}
+
+.data-section {
+  margin-top: 15px;
+}
+</style>
