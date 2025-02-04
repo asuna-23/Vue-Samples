@@ -257,3 +257,144 @@ export default {
 };
 </script>
 
+
+
+#### with api for data
+
+<template>
+  <div>
+    <!-- Button List -->
+    <div class="d-flex gap-3">
+      <SummaryCardButton
+        v-for="(summary, index) in summaryTypes"
+        :key="index"
+        :summary="getSummaryData(summary.key)"
+        :activeButton="selectedSummary?.title"
+        @click="setActive(summary.key)"
+      />
+    </div>
+
+    <!-- Display Data of Selected Button -->
+    <div v-if="selectedSummary" class="mt-4 p-3 border rounded bg-light">
+      <h4 class="text-center">{{ selectedSummary.title }} Summary</h4>
+      <pre>{{ selectedData }}</pre> <!-- Display the filtered data as JSON -->
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      mockData: [],  // Initially empty, will be populated by the API response
+      selectedSummary: null,
+      selectedData: [],
+      summaryTypes: [
+        { title: 'Hourly', key: 'hourly', actualLabel: 'Actual Hourly to Date', targetLabel: 'Target Hourly' },
+        { title: 'Daily', key: 'daily', actualLabel: 'Actual Daily to Date', targetLabel: 'Target Daily' },
+        { title: 'Monthly', key: 'monthly', actualLabel: 'Actual Monthly to Date', targetLabel: 'Target Monthly' },
+        { title: 'Yearly', key: 'yearly', actualLabel: 'Actual Yearly to Date', targetLabel: 'Target Yearly' }
+      ]
+    };
+  },
+  computed: {
+    // Function to calculate aggregated data for each category
+    aggregatedData() {
+      return {
+        hourly: this.calculateAggregatedData('hourly'),
+        daily: this.calculateAggregatedData('daily'),
+        monthly: this.calculateAggregatedData('monthly'),
+        yearly: this.calculateAggregatedData('yearly')
+      };
+    }
+  },
+  mounted() {
+    this.fetchData();  // Fetch data when the component is mounted
+  },
+  methods: {
+    // Function to fetch data from the backend
+    async fetchData() {
+      try {
+        const response = await fetch('https://your-backend-api.com/data'); // Replace with your backend API URL
+        const data = await response.json();
+        this.mockData = data;  // Store the fetched data in mockData
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    },
+
+    // Function to calculate aggregated data for each category
+    calculateAggregatedData(category) {
+      let totalActual = 0;
+      let totalTarget = 0;
+
+      const filteredData = this.getFilteredData(category);
+
+      filteredData.forEach(item => {
+        totalActual += item.actual;
+        totalTarget += item.plan;
+      });
+
+      return {
+        actual: totalActual,
+        target: totalTarget
+      };
+    },
+
+    // Method to get filtered data based on the selected category
+    getFilteredData(category) {
+      let filteredData = [];
+      const currentDate = new Date();
+
+      switch (category) {
+        case 'hourly':
+          const currentHour = currentDate.getHours(); // Get the current hour
+          filteredData = this.mockData.filter(item => {
+            const hour = new Date(item.datetime).getHours();
+            return hour === currentHour;
+          });
+          break;
+
+        case 'daily':
+          const currentDateString = currentDate.toISOString().slice(0, 10); // Format date as YYYY-MM-DD
+          filteredData = this.mockData.filter(item => item.datetime.slice(0, 10) === currentDateString);
+          break;
+
+        case 'monthly':
+          const currentMonth = currentDate.getMonth(); // Get current month (0-based index)
+          const currentYear = currentDate.getFullYear();
+          filteredData = this.mockData.filter(item => {
+            const itemDate = new Date(item.datetime);
+            return itemDate.getFullYear() === currentYear && itemDate.getMonth() === currentMonth;
+          });
+          break;
+
+        case 'yearly':
+          const currentYearForYearly = currentDate.getFullYear();
+          filteredData = this.mockData.filter(item => new Date(item.datetime).getFullYear() === currentYearForYearly);
+          break;
+      }
+
+      return filteredData;
+    },
+
+    // Function to get summary data based on category key
+    getSummaryData(categoryKey) {
+      return {
+        title: this.summaryTypes.find(type => type.key === categoryKey)?.title,
+        actualValue: this.aggregatedData[categoryKey].actual,
+        targetValue: this.aggregatedData[categoryKey].target,
+        actualLabel: this.summaryTypes.find(type => type.key === categoryKey)?.actualLabel,
+        targetLabel: this.summaryTypes.find(type => type.key === categoryKey)?.targetLabel
+      };
+    },
+
+    // Handle button click event to set the active category
+    setActive(categoryKey) {
+      this.selectedSummary = this.summaryTypes.find(type => type.key === categoryKey);
+      this.selectedData = this.getFilteredData(categoryKey);
+    }
+  }
+};
+</script>
+
