@@ -1,0 +1,200 @@
+/// common card button
+
+<template>
+  <b-button 
+    :variant="recipe.display.variant" 
+    :class="[recipe.display.class, { 'active-btn': isActive }]"
+    @click="$emit('click', summary)"
+  >
+    <h5 class="fw-bold">{{ summary.title }}</h5>
+    <div>
+      <h2 class="fw-bold">{{ summary.actualValue }}</h2>
+      <p class="small text-muted">{{ summary.actualLabel }}</p>
+    </div>
+    <div class="mt-2">
+      <h2 class="fw-bold">{{ summary.targetValue }}</h2>
+      <p class="small text-muted">{{ summary.targetLabel }}</p>
+    </div>
+  </b-button>
+</template>
+
+<script>
+import { card_btn_recipe } from "@/recipes/rCommonCardButton.js";
+
+export default {
+  props: {
+    summary: {
+      type: Object,
+      default: null // We will not set a default here, rely on recipe
+    },
+    activeButton: String
+  },
+  data() {
+    return {
+      recipe: card_btn_recipe[0]  // Default recipe properties
+    };
+  },
+  computed: {
+    summary() {
+      return this.$props.summary || this.recipe.data.summary; // Use recipe if no summary is passed
+    },
+    isActive() {
+      return this.activeButton === this.summary.title;
+    }
+  }
+};
+</script>
+
+<style scoped>
+.card-btn {
+  border: 2px solid yellow;
+  border-radius: 10px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s ease;
+}
+
+.active-btn {
+  border-color: red !important;
+}
+</style>
+
+
+////
+
+// rCommonCardButton.js
+const card_btn_recipe = [
+  {
+    data: {
+      summary: {
+        title: "Default Title",  // Default value
+        actualValue: 0,         // Default value
+        targetValue: 0,         // Default value
+        actualLabel: "Default Actual Label", // Default value
+        targetLabel: "Default Target Label"  // Default value
+      },
+      activeButton: ""
+    },
+    directives: {},
+    display: {
+      variant: "light",
+      class: "card-btn p-3 text-center w-100"
+    },
+    events: {
+      click: "handleClick"
+    }
+  }
+];
+
+export { card_btn_recipe };
+
+
+///////
+
+<template>
+  <b-button 
+    :variant="recipe.display.variant" 
+    :class="[recipe.display.class, { 'active-btn': isActive }]"
+    @click="$emit('click', summary)"
+  >
+    <h5 class="fw-bold">{{ summary.title }}</h5>
+    <div>
+      <h2 class="fw-bold">{{ summary.actualValue }}</h2>
+      <p class="small text-muted">{{ summary.actualLabel }}</p>
+    </div>
+    <div class="mt-2">
+      <h2 class="fw-bold">{{ summary.targetValue }}</h2>
+      <p class="small text-muted">{{ summary.targetLabel }}</p>
+    </div>
+  </b-button>
+</template>
+
+<script>
+import { card_btn_recipe } from "@/recipes/rCommonCardButton.js";
+
+export default {
+  props: {
+    summary: {
+      type: Object,
+      default: () => ({
+        title: "Default Title",
+        actualValue: 0,
+        targetValue: 0,
+        actualLabel: "Default Actual Label",
+        targetLabel: "Default Target Label"
+      })
+    },
+    activeButton: String
+  },
+  data() {
+    return {
+      recipe: card_btn_recipe[0]  // Default recipe properties
+    };
+  },
+  computed: {
+    isActive() {
+      return this.activeButton === this.summary.title;
+    }
+  }
+};
+</script>
+
+<style scoped>
+.card-btn {
+  border: 2px solid yellow;
+  border-radius: 10px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s ease;
+}
+
+.active-btn {
+  border-color: red !important;
+}
+</style>
+
+
+///
+
+<template>
+  <div>
+    <!-- Button List -->
+    <div class="d-flex gap-3">
+      <SummaryCardButton 
+        v-for="(summary, index) in summaries" 
+        :key="index"
+        :summary="summary" <!-- Pass custom summary values -->
+        :activeButton="selectedSummary?.title"
+        @click="setActive"
+      />
+    </div>
+
+    <!-- Display Details of Selected Button -->
+    <div v-if="selectedSummary" class="mt-4 p-3 border rounded bg-light">
+      <h4 class="text-center">{{ selectedSummary.title }} Summary</h4>
+      <p><strong>Actual:</strong> {{ selectedSummary.actualValue }} ({{ selectedSummary.actualLabel }})</p>
+      <p><strong>Target:</strong> {{ selectedSummary.targetValue }} ({{ selectedSummary.targetLabel }})</p>
+    </div>
+  </div>
+</template>
+
+<script>
+import SummaryCardButton from "@/components/SummaryCardButton.vue";
+
+export default {
+  components: { SummaryCardButton },
+  data() {
+    return {
+      selectedSummary: null,
+      summaries: [
+        { title: "Hourly", actualValue: 35, targetValue: 50, actualLabel: "Actual Hourly to Date", targetLabel: "Target Hourly" },
+        { title: "Monthly", actualValue: 1200, targetValue: 1500, actualLabel: "Actual Monthly to Date", targetLabel: "Target Monthly" },
+        { title: "Yearly", actualValue: 14000, targetValue: 18000, actualLabel: "Actual Yearly to Date", targetLabel: "Target Yearly" }
+      ]
+    };
+  },
+  methods: {
+    setActive(summary) {
+      this.selectedSummary = summary;
+    }
+  }
+};
+</script>

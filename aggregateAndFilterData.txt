@@ -1,0 +1,259 @@
+///
+
+
+<script>
+export default {
+  data() {
+    return {
+      // mock_data as provided
+      mockData: [
+        { datetime: '2025-01-22 00:00', actual: 20035, plan: 30000 },
+        { datetime: '2025-01-22 01:00', actual: 23035, plan: 30000 },
+        { datetime: '2025-01-22 02:00', actual: 30035, plan: 36000 },
+        { datetime: '2025-01-23 00:00', actual: 25000, plan: 31000 },
+        { datetime: '2025-01-24 00:00', actual: 27050, plan: 32000 },
+        { datetime: '2025-01-25 00:00', actual: 19000, plan: 29000 },
+        { datetime: '2025-01-26 00:00', actual: 31000, plan: 33000 },
+        { datetime: '2025-01-27 00:00', actual: 28000, plan: 34000 },
+        { datetime: '2025-01-28 00:00', actual: 26000, plan: 31000 },
+        { datetime: '2025-01-29 00:00', actual: 45758, plan: 30000 },
+        { datetime: '2025-01-30 00:00', actual: 24050, plan: 31000 },
+        { datetime: '2025-01-31 00:00', actual: 29500, plan: 35000 },
+        { datetime: '2025-02-01 00:00', actual: 35500, plan: 29500 },
+        { datetime: '2025-02-02 00:00', actual: 27500, plan: 31500 },
+        { datetime: '2025-02-03 00:00', actual: 28500, plan: 32000 },
+        { datetime: '2025-02-04 00:00', actual: 35500, plan: 33000 },
+        { datetime: '2025-02-04 01:00', actual: 24500, plan: 33000 },
+        { datetime: '2025-02-04 02:00', actual: 35500, plan: 25000 }
+      ],
+      aggregatedData: {
+        hourly: { actual: 0, target: 0 },
+        daily: { actual: 0, target: 0 },
+        monthly: { actual: 0, target: 0 },
+        yearly: { actual: 0, target: 0 }
+      },
+      selectedSummary: null,
+      selectedData: []
+    };
+  },
+  computed: {
+    // Compute the aggregated data for each category (hourly, daily, monthly, yearly)
+    aggregatedData() {
+      return {
+        hourly: this.calculateAggregatedData('hourly'),
+        daily: this.calculateAggregatedData('daily'),
+        monthly: this.calculateAggregatedData('monthly'),
+        yearly: this.calculateAggregatedData('yearly')
+      };
+    }
+  },
+  methods: {
+    // Function to calculate aggregated data for each category
+    calculateAggregatedData(category) {
+      let totalActual = 0;
+      let totalTarget = 0;
+
+      const filteredData = this.getFilteredData(category);
+
+      filteredData.forEach(item => {
+        totalActual += item.actual;
+        totalTarget += item.plan;
+      });
+
+      return {
+        actual: totalActual,
+        target: totalTarget
+      };
+    },
+
+    // Method to get filtered data based on the selected category
+    getFilteredData(category) {
+      let filteredData = [];
+
+      switch (category) {
+        case 'hourly':
+          const currentHour = new Date().getHours(); // Get the current hour
+          filteredData = this.mockData.filter(item => {
+            const hour = new Date(item.datetime).getHours();
+            return hour === currentHour;
+          });
+          break;
+
+        case 'daily':
+          const currentDate = new Date().toISOString().slice(0, 10); // Format date as YYYY-MM-DD
+          filteredData = this.mockData.filter(item => item.datetime.slice(0, 10) === currentDate);
+          break;
+
+        case 'monthly':
+          const currentMonth = new Date().getMonth() + 1; // Get current month (0-based index)
+          const currentYear = new Date().getFullYear();
+          filteredData = this.mockData.filter(item => {
+            const itemDate = new Date(item.datetime);
+            return itemDate.getFullYear() === currentYear && itemDate.getMonth() + 1 === currentMonth;
+          });
+          break;
+
+        case 'yearly':
+          const currentYear = new Date().getFullYear();
+          filteredData = this.mockData.filter(item => new Date(item.datetime).getFullYear() === currentYear);
+          break;
+      }
+
+      return filteredData;
+    },
+
+    // Handle button click event to set the active category
+    setActive(category) {
+      this.selectedSummary = { title: category };
+      this.selectedData = this.getFilteredData(category);
+    }
+  }
+};
+</script>
+
+
+/// 2
+
+
+<template>
+  <div>
+    <!-- Button List -->
+    <div class="d-flex gap-3">
+      <SummaryCardButton
+        v-for="(summary, index) in summaryTypes"
+        :key="index"
+        :summary="getSummaryData(summary.key)"
+        :activeButton="selectedSummary?.title"
+        @click="setActive(summary.key)"
+      />
+    </div>
+
+    <!-- Display Data of Selected Button -->
+    <div v-if="selectedSummary" class="mt-4 p-3 border rounded bg-light">
+      <h4 class="text-center">{{ selectedSummary.title }} Summary</h4>
+      <pre>{{ selectedData }}</pre> <!-- Display the filtered data as JSON -->
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      mockData: [
+        { datetime: '2025-01-22 00:00', actual: 20035, plan: 30000 },
+        { datetime: '2025-01-22 01:00', actual: 23035, plan: 30000 },
+        { datetime: '2025-01-22 02:00', actual: 30035, plan: 36000 },
+        { datetime: '2025-01-23 00:00', actual: 25000, plan: 31000 },
+        { datetime: '2025-01-24 00:00', actual: 27050, plan: 32000 },
+        { datetime: '2025-01-25 00:00', actual: 19000, plan: 29000 },
+        { datetime: '2025-01-26 00:00', actual: 31000, plan: 33000 },
+        { datetime: '2025-01-27 00:00', actual: 28000, plan: 34000 },
+        { datetime: '2025-01-28 00:00', actual: 26000, plan: 31000 },
+        { datetime: '2025-01-29 00:00', actual: 45758, plan: 30000 },
+        { datetime: '2025-01-30 00:00', actual: 24050, plan: 31000 },
+        { datetime: '2025-01-31 00:00', actual: 29500, plan: 35000 },
+        { datetime: '2025-02-01 00:00', actual: 35500, plan: 29500 },
+        { datetime: '2025-02-02 00:00', actual: 27500, plan: 31500 },
+        { datetime: '2025-02-03 00:00', actual: 28500, plan: 32000 },
+        { datetime: '2025-02-04 00:00', actual: 35500, plan: 33000 },
+        { datetime: '2025-02-04 01:00', actual: 24500, plan: 33000 },
+        { datetime: '2025-02-04 02:00', actual: 35500, plan: 25000 }
+      ],
+      selectedSummary: null,
+      selectedData: [],
+      summaryTypes: [
+        { title: 'Hourly', key: 'hourly', actualLabel: 'Actual Hourly to Date', targetLabel: 'Target Hourly' },
+        { title: 'Daily', key: 'daily', actualLabel: 'Actual Daily to Date', targetLabel: 'Target Daily' },
+        { title: 'Monthly', key: 'monthly', actualLabel: 'Actual Monthly to Date', targetLabel: 'Target Monthly' },
+        { title: 'Yearly', key: 'yearly', actualLabel: 'Actual Yearly to Date', targetLabel: 'Target Yearly' }
+      ]
+    };
+  },
+  computed: {
+    // Function to calculate aggregated data for each category
+    aggregatedData() {
+      return {
+        hourly: this.calculateAggregatedData('hourly'),
+        daily: this.calculateAggregatedData('daily'),
+        monthly: this.calculateAggregatedData('monthly'),
+        yearly: this.calculateAggregatedData('yearly')
+      };
+    }
+  },
+  methods: {
+    // Function to calculate aggregated data for each category
+    calculateAggregatedData(category) {
+      let totalActual = 0;
+      let totalTarget = 0;
+
+      const filteredData = this.getFilteredData(category);
+
+      filteredData.forEach(item => {
+        totalActual += item.actual;
+        totalTarget += item.plan;
+      });
+
+      return {
+        actual: totalActual,
+        target: totalTarget
+      };
+    },
+
+    // Method to get filtered data based on the selected category
+    getFilteredData(category) {
+      let filteredData = [];
+      const currentDate = new Date();
+
+      switch (category) {
+        case 'hourly':
+          const currentHour = currentDate.getHours(); // Get the current hour
+          filteredData = this.mockData.filter(item => {
+            const hour = new Date(item.datetime).getHours();
+            return hour === currentHour;
+          });
+          break;
+
+        case 'daily':
+          const currentDateString = currentDate.toISOString().slice(0, 10); // Format date as YYYY-MM-DD
+          filteredData = this.mockData.filter(item => item.datetime.slice(0, 10) === currentDateString);
+          break;
+
+        case 'monthly':
+          const currentMonth = currentDate.getMonth(); // Get current month (0-based index)
+          const currentYear = currentDate.getFullYear();
+          filteredData = this.mockData.filter(item => {
+            const itemDate = new Date(item.datetime);
+            return itemDate.getFullYear() === currentYear && itemDate.getMonth() === currentMonth;
+          });
+          break;
+
+        case 'yearly':
+          const currentYearForYearly = currentDate.getFullYear();
+          filteredData = this.mockData.filter(item => new Date(item.datetime).getFullYear() === currentYearForYearly);
+          break;
+      }
+
+      return filteredData;
+    },
+
+    // Function to get summary data based on category key
+    getSummaryData(categoryKey) {
+      return {
+        title: this.summaryTypes.find(type => type.key === categoryKey)?.title,
+        actualValue: this.aggregatedData[categoryKey].actual,
+        targetValue: this.aggregatedData[categoryKey].target,
+        actualLabel: this.summaryTypes.find(type => type.key === categoryKey)?.actualLabel,
+        targetLabel: this.summaryTypes.find(type => type.key === categoryKey)?.targetLabel
+      };
+    },
+
+    // Handle button click event to set the active category
+    setActive(categoryKey) {
+      this.selectedSummary = this.summaryTypes.find(type => type.key === categoryKey);
+      this.selectedData = this.getFilteredData(categoryKey);
+    }
+  }
+};
+</script>
+

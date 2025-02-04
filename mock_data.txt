@@ -1,0 +1,20 @@
+const mock_data = [
+  { datetime: '2025-01-22 00:00', actual: 20035, plan: 30000 },
+{ datetime: '2025-01-22 01:00', actual: 23035, plan: 30000 },
+{ datetime: '2025-01-22 02:00', actual: 30035, plan: 36000 },
+  { datetime: '2025-01-23 00:00', actual: 25000, plan: 31000 },
+  { datetime: '2025-01-24 00:00', actual: 27050, plan: 32000 },
+  { datetime: '2025-01-25 00:00', actual: 19000, plan: 29000 },
+  { datetime: '2025-01-26 00:00', actual: 31000, plan: 33000 },
+  { datetime: '2025-01-27 00:00', actual: 28000, plan: 34000 },
+  { datetime: '2025-01-28 00:00', actual: 26000, plan: 31000 },
+  { datetime: '2025-01-29 00:00', actual: 45758, plan: 30000 },
+  { datetime: '2025-01-30 00:00', actual: 24050, plan: 31000 },
+  { datetime: '2025-01-31 00:00', actual: 29500, plan: 35000 },
+  { datetime: '2025-02-01 00:00', actual: 35500, plan: 29500 },
+  { datetime: '2025-02-02 00:00', actual: 27500, plan: 31500 },
+  { datetime: '2025-02-03 00:00', actual: 28500, plan: 32000 },
+  { datetime: '2025-02-04 00:00', actual: 35500, plan: 33000 },
+ { datetime: '2025-02-04 01:00', actual: 24500, plan: 33000 },
+{ datetime: '2025-02-04 02:00', actual: 35500, plan: 25000 }
+];

@@ -1,0 +1,150 @@
+// <template>
+  <div>
+    <!-- Button List -->
+    <div class="d-flex gap-3">
+      <!-- Hourly Summary Button -->
+      <SummaryCardButton 
+        :summary="{
+          title: 'Hourly', 
+          actualValue: '', 
+          targetValue: '', 
+          actualLabel: 'Actual Hourly to Date', 
+          targetLabel: 'Target Hourly'
+        }"
+        :activeButton="selectedSummary?.title"
+        @click="setActive('hourly')"
+      />
+
+      <!-- Daily Summary Button -->
+      <SummaryCardButton 
+        :summary="{
+          title: 'Daily', 
+          actualValue: '', 
+          targetValue: '', 
+          actualLabel: 'Actual Daily to Date', 
+          targetLabel: 'Target Daily'
+        }"
+        :activeButton="selectedSummary?.title"
+        @click="setActive('daily')"
+      />
+
+      <!-- Monthly Summary Button -->
+      <SummaryCardButton 
+        :summary="{
+          title: 'Monthly', 
+          actualValue: '', 
+          targetValue: '', 
+          actualLabel: 'Actual Monthly to Date', 
+          targetLabel: 'Target Monthly'
+        }"
+        :activeButton="selectedSummary?.title"
+        @click="setActive('monthly')"
+      />
+
+      <!-- Yearly Summary Button -->
+      <SummaryCardButton 
+        :summary="{
+          title: 'Yearly', 
+          actualValue: '', 
+          targetValue: '', 
+          actualLabel: 'Actual Yearly to Date', 
+          targetLabel: 'Target Yearly'
+        }"
+        :activeButton="selectedSummary?.title"
+        @click="setActive('yearly')"
+      />
+    </div>
+
+    <!-- Display Data of Selected Button -->
+    <div v-if="selectedSummary" class="mt-4 p-3 border rounded bg-light">
+      <h4 class="text-center">{{ selectedSummary.title }} Summary</h4>
+      <pre>{{ selectedData }}</pre> <!-- Display the complete data as JSON -->
+    </div>
+  </div>
+</template>
+
+
+
+// <script>
+export default {
+  data() {
+    return {
+      // mock_data as provided
+      mockData: [
+        { datetime: '2025-01-22 00:00', actual: 20035, plan: 30000 },
+        { datetime: '2025-01-22 01:00', actual: 23035, plan: 30000 },
+        { datetime: '2025-01-22 02:00', actual: 30035, plan: 36000 },
+        { datetime: '2025-01-23 00:00', actual: 25000, plan: 31000 },
+        { datetime: '2025-01-24 00:00', actual: 27050, plan: 32000 },
+        { datetime: '2025-01-25 00:00', actual: 19000, plan: 29000 },
+        { datetime: '2025-01-26 00:00', actual: 31000, plan: 33000 },
+        { datetime: '2025-01-27 00:00', actual: 28000, plan: 34000 },
+        { datetime: '2025-01-28 00:00', actual: 26000, plan: 31000 },
+        { datetime: '2025-01-29 00:00', actual: 45758, plan: 30000 },
+        { datetime: '2025-01-30 00:00', actual: 24050, plan: 31000 },
+        { datetime: '2025-01-31 00:00', actual: 29500, plan: 35000 },
+        { datetime: '2025-02-01 00:00', actual: 35500, plan: 29500 },
+        { datetime: '2025-02-02 00:00', actual: 27500, plan: 31500 },
+        { datetime: '2025-02-03 00:00', actual: 28500, plan: 32000 },
+        { datetime: '2025-02-04 00:00', actual: 35500, plan: 33000 },
+        { datetime: '2025-02-04 01:00', actual: 24500, plan: 33000 },
+        { datetime: '2025-02-04 02:00', actual: 35500, plan: 25000 }
+      ],
+      selectedSummary: null,
+      selectedData: []
+    };
+  },
+  methods: {
+    setActive(category) {
+      this.selectedSummary = { title: category };
+
+      // Get data based on the selected category
+      switch (category) {
+        case 'hourly':
+          this.selectedData = this.getHourlyData();
+          break;
+        case 'daily':
+          this.selectedData = this.getDailyData();
+          break;
+        case 'monthly':
+          this.selectedData = this.getMonthlyData();
+          break;
+        case 'yearly':
+          this.selectedData = this.getYearlyData();
+          break;
+      }
+    },
+    
+    // Method to get Hourly data
+    getHourlyData() {
+      const currentHour = new Date().getHours(); // Get the current hour
+      return this.mockData.filter(item => {
+        const hour = new Date(item.datetime).getHours();
+        return hour === currentHour;
+      });
+    },
+    
+    // Method to get Daily data
+    getDailyData() {
+      const currentDate = new Date().toISOString().slice(0, 10); // Format date as YYYY-MM-DD
+      return this.mockData.filter(item => item.datetime.slice(0, 10) === currentDate);
+    },
+    
+    // Method to get Monthly data
+    getMonthlyData() {
+      const currentMonth = new Date().getMonth() + 1; // Get current month (0-based index)
+      const currentYear = new Date().getFullYear();
+      return this.mockData.filter(item => {
+        const itemDate = new Date(item.datetime);
+        return itemDate.getFullYear() === currentYear && itemDate.getMonth() + 1 === currentMonth;
+      });
+    },
+    
+    // Method to get Yearly data
+    getYearlyData() {
+      const currentYear = new Date().getFullYear();
+      return this.mockData.filter(item => new Date(item.datetime).getFullYear() === currentYear);
+    }
+  }
+};
+</script>

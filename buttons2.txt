@@ -1,0 +1,333 @@
+///
+
+<template>
+  <b-button variant="light" class="card-btn p-3 text-center w-100" @click="$emit('click')">
+    <h5 class="fw-bold">{{ title }}</h5>
+    <div class="summary-section">
+      <h2 class="fw-bold">{{ actualValue }}</h2>
+      <p class="small text-muted">{{ actualLabel }}</p>
+    </div>
+    <div class="summary-section mt-2">
+      <h2 class="fw-bold">{{ targetValue }}</h2>
+      <p class="small text-muted">{{ targetLabel }}</p>
+    </div>
+  </b-button>
+</template>
+
+<script>
+export default {
+  props: {
+    title: String,       // e.g., "Hourly", "Monthly", "Yearly"
+    actualValue: Number, // e.g., 35
+    targetValue: Number, // e.g., 50
+    actualLabel: String, // e.g., "Actual Hourly to Date"
+    targetLabel: String  // e.g., "Target Hourly"
+  }
+}
+</script>
+
+<style scoped>
+.card-btn {
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+}
+</style>
+
+
+
+/////////////////////////
+
+<template>
+  <b-button 
+    variant="light" 
+    class="card-btn p-3 text-center w-100"
+    :class="{ 'active-btn': isActive }"
+    @click="$emit('click')"
+  >
+    <h5 class="fw-bold">{{ title }}</h5>
+    <div class="summary-section">
+      <h2 class="fw-bold">{{ actualValue }}</h2>
+      <p class="small text-muted">{{ actualLabel }}</p>
+    </div>
+    <div class="summary-section mt-2">
+      <h2 class="fw-bold">{{ targetValue }}</h2>
+      <p class="small text-muted">{{ targetLabel }}</p>
+    </div>
+  </b-button>
+</template>
+
+<script>
+export default {
+  props: {
+    title: String,
+    actualValue: Number,
+    targetValue: Number,
+    actualLabel: String,
+    targetLabel: String,
+    isActive: Boolean // Prop to track active button
+  }
+}
+</script>
+
+<style scoped>
+.card-btn {
+  border: 2px solid yellow;
+  border-radius: 10px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s ease;
+}
+
+.active-btn {
+  border-color: red !important;
+}
+</style>
+
+------
+
+<template>
+  <div class="d-flex gap-3">
+    <SummaryCardButton 
+      title="Hourly" 
+      :actualValue="35" 
+      :targetValue="50"
+      actualLabel="Actual Hourly to Date"
+      targetLabel="Target Hourly"
+      :isActive="activeButton === 'Hourly'"
+      @click="setActive('Hourly')"
+    />
+
+    <SummaryCardButton 
+      title="Monthly" 
+      :actualValue="1200" 
+      :targetValue="1500"
+      actualLabel="Actual Monthly to Date"
+      targetLabel="Target Monthly"
+      :isActive="activeButton === 'Monthly'"
+      @click="setActive('Monthly')"
+    />
+
+    <SummaryCardButton 
+      title="Yearly" 
+      :actualValue="14000" 
+      :targetValue="18000"
+      actualLabel="Actual Yearly to Date"
+      targetLabel="Target Yearly"
+      :isActive="activeButton === 'Yearly'"
+      @click="setActive('Yearly')"
+    />
+  </div>
+</template>
+
+<script>
+import SummaryCardButton from "@/components/SummaryCardButton.vue";
+
+export default {
+  components: { SummaryCardButton },
+  data() {
+    return {
+      activeButton: null
+    };
+  },
+  methods: {
+    setActive(type) {
+      this.activeButton = type;
+    }
+  }
+}
+</script>
+
+
+---------------------------- optimized
+
+//
+
+<template>
+  <b-button 
+    variant="light" 
+    class="card-btn p-3 text-center w-100"
+    :class="{ 'active-btn': isActive }"
+    @click="$emit('click', title)"
+  >
+    <h5 class="fw-bold">{{ title }}</h5>
+    <div>
+      <h2 class="fw-bold">{{ actualValue }}</h2>
+      <p class="small text-muted">{{ actualLabel }}</p>
+    </div>
+    <div class="mt-2">
+      <h2 class="fw-bold">{{ targetValue }}</h2>
+      <p class="small text-muted">{{ targetLabel }}</p>
+    </div>
+  </b-button>
+</template>
+
+<script>
+export default {
+  props: {
+    title: String,
+    actualValue: Number,
+    targetValue: Number,
+    actualLabel: String,
+    targetLabel: String,
+    activeButton: String
+  },
+  computed: {
+    isActive() {
+      return this.activeButton === this.title;
+    }
+  }
+}
+</script>
+
+<style scoped>
+.card-btn {
+  border: 2px solid yellow;
+  border-radius: 10px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s ease;
+}
+
+.active-btn {
+  border-color: red !important;
+}
+</style>
+
+
+//
+
+<template>
+  <div class="d-flex gap-3">
+    <SummaryCardButton 
+      v-for="(summary, index) in summaries" 
+      :key="index"
+      v-bind="summary"
+      :activeButton="activeButton"
+      @click="setActive"
+    />
+  </div>
+</template>
+
+<script>
+import SummaryCardButton from "@/components/SummaryCardButton.vue";
+
+export default {
+  components: { SummaryCardButton },
+  data() {
+    return {
+      activeButton: null,
+      summaries: [
+        { title: "Hourly", actualValue: 35, targetValue: 50, actualLabel: "Actual Hourly to Date", targetLabel: "Target Hourly" },
+        { title: "Monthly", actualValue: 1200, targetValue: 1500, actualLabel: "Actual Monthly to Date", targetLabel: "Target Monthly" },
+        { title: "Yearly", actualValue: 14000, targetValue: 18000, actualLabel: "Actual Yearly to Date", targetLabel: "Target Yearly" }
+      ]
+    };
+  },
+  methods: {
+    setActive(title) {
+      this.activeButton = title;
+    }
+  }
+}
+</script>
+
+
+///////----------------------------------------------------/////
+
+// child
+
+<template>
+  <b-button 
+    variant="light" 
+    class="card-btn p-3 text-center w-100"
+    :class="{ 'active-btn': isActive }"
+    @click="$emit('click', summary)"
+  >
+    <h5 class="fw-bold">{{ summary.title }}</h5>
+    <div>
+      <h2 class="fw-bold">{{ summary.actualValue }}</h2>
+      <p class="small text-muted">{{ summary.actualLabel }}</p>
+    </div>
+    <div class="mt-2">
+      <h2 class="fw-bold">{{ summary.targetValue }}</h2>
+      <p class="small text-muted">{{ summary.targetLabel }}</p>
+    </div>
+  </b-button>
+</template>
+
+<script>
+export default {
+  props: {
+    summary: Object,
+    activeButton: String
+  },
+  computed: {
+    isActive() {
+      return this.activeButton === this.summary.title;
+    }
+  }
+}
+</script>
+
+<style scoped>
+.card-btn {
+  border: 2px solid yellow;
+  border-radius: 10px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s ease;
+}
+
+.active-btn {
+  border-color: red !important;
+}
+</style>
+
+
+// parent
+
+<template>
+  <div>
+    <!-- Button List -->
+    <div class="d-flex gap-3">
+      <SummaryCardButton 
+        v-for="(summary, index) in summaries" 
+        :key="index"
+        :summary="summary"
+        :activeButton="selectedSummary?.title"
+        @click="setActive"
+      />
+    </div>
+
+    <!-- Display Details of Selected Button -->
+    <div v-if="selectedSummary" class="mt-4 p-3 border rounded bg-light">
+      <h4 class="text-center">{{ selectedSummary.title }} Summary</h4>
+      <p><strong>Actual:</strong> {{ selectedSummary.actualValue }} ({{ selectedSummary.actualLabel }})</p>
+      <p><strong>Target:</strong> {{ selectedSummary.targetValue }} ({{ selectedSummary.targetLabel }})</p>
+    </div>
+  </div>
+</template>
+
+<script>
+import SummaryCardButton from "@/components/SummaryCardButton.vue";
+
+export default {
+  components: { SummaryCardButton },
+  data() {
+    return {
+      selectedSummary: null,
+      summaries: [
+        { title: "Hourly", actualValue: 35, targetValue: 50, actualLabel: "Actual Hourly to Date", targetLabel: "Target Hourly" },
+        { title: "Monthly", actualValue: 1200, targetValue: 1500, actualLabel: "Actual Monthly to Date", targetLabel: "Target Monthly" },
+        { title: "Yearly", actualValue: 14000, targetValue: 18000, actualLabel: "Actual Yearly to Date", targetLabel: "Target Yearly" }
+      ]
+    };
+  },
+  methods: {
+    setActive(summary) {
+      this.selectedSummary = summary;
+    }
+  }
+}
+</script>
+
+
+
