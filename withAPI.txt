@@ -1,0 +1,508 @@
+### api
+
+from flask import Blueprint, jsonify
+from datetime import datetime
+from models import SummaryData, db
+
+# Initialize blueprint
+summary_bp = Blueprint('summary', __name__)
+
+# Helper function to filter the data for each category
+def filter_data(category):
+    current_date = datetime.now()
+    
+    if category == 'hourly':
+        current_hour = current_date.hour
+        return SummaryData.query.filter(SummaryData.datetime.like(f"{current_date.strftime('%Y-%m-%d')} {current_hour}%")).all()
+
+    elif category == 'daily':
+        current_date_str = current_date.strftime('%Y-%m-%d')
+        return SummaryData.query.filter(SummaryData.datetime.like(f"{current_date_str}%")).all()
+
+    elif category == 'monthly':
+        current_month = current_date.month
+        current_year = current_date.year
+        return SummaryData.query.filter(SummaryData.datetime.like(f"{current_year}-{current_month:02d}%")).all()
+
+    elif category == 'yearly':
+        current_year = current_date.year
+        return SummaryData.query.filter(SummaryData.datetime.like(f"{current_year}%")).all()
+
+    return []
+
+# Endpoint for hourly summary
+@summary_bp.route('/summary/hourly', methods=['GET'])
+def get_hourly_summary():
+    data = filter_data('hourly')
+    return jsonify([{
+        'datetime': item.datetime,
+        'actual': item.actual,
+        'plan': item.plan
+    } for item in data])
+
+# Endpoint for daily summary
+@summary_bp.route('/summary/daily', methods=['GET'])
+def get_daily_summary():
+    data = filter_data('daily')
+    return jsonify([{
+        'datetime': item.datetime,
+        'actual': item.actual,
+        'plan': item.plan
+    } for item in data])
+
+# Endpoint for monthly summary
+@summary_bp.route('/summary/monthly', methods=['GET'])
+def get_monthly_summary():
+    data = filter_data('monthly')
+    return jsonify([{
+        'datetime': item.datetime,
+        'actual': item.actual,
+        'plan': item.plan
+    } for item in data])
+
+# Endpoint for yearly summary
+@summary_bp.route('/summary/yearly', methods=['GET'])
+def get_yearly_summary():
+    data = filter_data('yearly')
+    return jsonify([{
+        'datetime': item.datetime,
+        'actual': item.actual,
+        'plan': item.plan
+    } for item in data])
+
+
+
+/// 1
+
+<template>
+  <div>
+    <!-- Button List -->
+    <div class="d-flex gap-3">
+      <SummaryCardButton
+        v-for="(summary, index) in summaryTypes"
+        :key="index"
+        :summary="getSummaryData(summary.key)"
+        :activeButton="selectedSummary?.title"
+        @click="setActive(summary.key)"
+      />
+    </div>
+
+    <!-- Display Data of Selected Button -->
+    <div v-if="selectedSummary" class="mt-4 p-3 border rounded bg-light">
+      <h4 class="text-center">{{ selectedSummary.title }} Summary</h4>
+      <pre>{{ selectedData }}</pre> <!-- Display the filtered data as JSON -->
+    </div>
+  </div>
+</template>
+
+<script>
+import axios from 'axios';
+
+export default {
+  data() {
+    return {
+      selectedSummary: null,
+      selectedData: [],
+      summaryTypes: [
+        { title: 'Hourly', key: 'hourly', actualLabel: 'Actual Hourly to Date', targetLabel: 'Target Hourly' },
+        { title: 'Daily', key: 'daily', actualLabel: 'Actual Daily to Date', targetLabel: 'Target Daily' },
+        { title: 'Monthly', key: 'monthly', actualLabel: 'Actual Monthly to Date', targetLabel: 'Target Monthly' },
+        { title: 'Yearly', key: 'yearly', actualLabel: 'Actual Yearly to Date', targetLabel: 'Target Yearly' }
+      ]
+    };
+  },
+  computed: {
+    // This function is kept as is for aggregated data logic
+    aggregatedData() {
+      return {
+        hourly: this.calculateAggregatedData('hourly'),
+        daily: this.calculateAggregatedData('daily'),
+        monthly: this.calculateAggregatedData('monthly'),
+        yearly: this.calculateAggregatedData('yearly')
+      };
+    }
+  },
+  methods: {
+    // Function to calculate aggregated data for each category
+    calculateAggregatedData(category) {
+      let totalActual = 0;
+      let totalTarget = 0;
+
+      const filteredData = this.selectedData;
+
+      filteredData.forEach(item => {
+        totalActual += item.actual;
+        totalTarget += item.plan;
+      });
+
+      return {
+        actual: totalActual,
+        target: totalTarget
+      };
+    },
+
+    // Function to fetch summary data based on category key from the API
+    fetchSummaryData(category) {
+      let endpoint = '';
+      switch (category) {
+        case 'hourly':
+          endpoint = '/summary/hourly';
+          break;
+        case 'daily':
+          endpoint = '/summary/daily';
+          break;
+        case 'monthly':
+          endpoint = '/summary/monthly';
+          break;
+        case 'yearly':
+          endpoint = '/summary/yearly';
+          break;
+        default:
+          return;
+      }
+
+      // Making an API call to fetch the data
+      axios.get(endpoint)
+        .then(response => {
+          this.selectedData = response.data;
+          this.selectedSummary = this.summaryTypes.find(type => type.key === category);
+        })
+        .catch(error => {
+          console.error("Error fetching summary data: ", error);
+        });
+    },
+
+    // Function to get the summary data based on the selected category
+    getSummaryData(categoryKey) {
+      return {
+        title: this.summaryTypes.find(type => type.key === categoryKey)?.title,
+        actualValue: this.aggregatedData[categoryKey]?.actual,
+        targetValue: this.aggregatedData[categoryKey]?.target,
+        actualLabel: this.summaryTypes.find(type => type.key === categoryKey)?.actualLabel,
+        targetLabel: this.summaryTypes.find(type => type.key === categoryKey)?.targetLabel
+      };
+    },
+
+    // Handle button click event to set the active category
+    setActive(categoryKey) {
+      this.fetchSummaryData(categoryKey);
+    }
+  }
+};
+</script>
+
+
+
+/// 2
+
+<template>
+  <div>
+    <!-- Button List -->
+    <div class="d-flex gap-3">
+      <SummaryCardButton
+        v-for="(summary, index) in summaryTypes"
+        :key="index"
+        :summary="getSummaryData(summary.key)"
+        :activeButton="selectedSummary?.title"
+        @click="setActive(summary.key)"
+      />
+    </div>
+
+    <!-- Display Data of Selected Button -->
+    <div v-if="selectedSummary" class="mt-4 p-3 border rounded bg-light">
+      <h4 class="text-center">{{ selectedSummary.title }} Summary</h4>
+      <pre>{{ selectedData }}</pre> <!-- Display the filtered data as JSON -->
+    </div>
+  </div>
+</template>
+
+<script>
+import axios from 'axios';
+
+export default {
+  data() {
+    return {
+      selectedSummary: null,
+      selectedData: [],
+      summaryTypes: [
+        { title: 'Hourly', key: 'hourly', actualLabel: 'Actual Hourly to Date', targetLabel: 'Target Hourly' },
+        { title: 'Daily', key: 'daily', actualLabel: 'Actual Daily to Date', targetLabel: 'Target Daily' },
+        { title: 'Monthly', key: 'monthly', actualLabel: 'Actual Monthly to Date', targetLabel: 'Target Monthly' },
+        { title: 'Yearly', key: 'yearly', actualLabel: 'Actual Yearly to Date', targetLabel: 'Target Yearly' }
+      ],
+      summaryDataCache: {} // Cache for fetched summary data
+    };
+  },
+  computed: {
+    // Simplified aggregated data using cached selectedData
+    aggregatedData() {
+      if (!this.selectedData || this.selectedData.length === 0) return {};
+
+      const totalActual = this.selectedData.reduce((sum, item) => sum + item.actual, 0);
+      const totalTarget = this.selectedData.reduce((sum, item) => sum + item.plan, 0);
+
+      return {
+        actual: totalActual,
+        target: totalTarget
+      };
+    }
+  },
+  methods: {
+    // Function to fetch summary data based on category key from the API
+    fetchSummaryData(category) {
+      if (this.summaryDataCache[category]) {
+        // If data is already cached, just return it
+        this.selectedData = this.summaryDataCache[category];
+        this.selectedSummary = this.summaryTypes.find(type => type.key === category);
+        return;
+      }
+
+      let endpoint = '';
+      switch (category) {
+        case 'hourly':
+          endpoint = '/summary/hourly';
+          break;
+        case 'daily':
+          endpoint = '/summary/daily';
+          break;
+        case 'monthly':
+          endpoint = '/summary/monthly';
+          break;
+        case 'yearly':
+          endpoint = '/summary/yearly';
+          break;
+        default:
+          return;
+      }
+
+      // Making an API call to fetch the data
+      axios.get(endpoint)
+        .then(response => {
+          this.selectedData = response.data;
+          this.summaryDataCache[category] = response.data; // Cache the response data
+          this.selectedSummary = this.summaryTypes.find(type => type.key === category);
+        })
+        .catch(error => {
+          console.error("Error fetching summary data: ", error);
+        });
+    },
+
+    // Function to get the summary data based on the selected category
+    getSummaryData(categoryKey) {
+      const summary = this.summaryTypes.find(type => type.key === categoryKey);
+      return {
+        title: summary?.title,
+        actualValue: this.aggregatedData.actual,
+        targetValue: this.aggregatedData.target,
+        actualLabel: summary?.actualLabel,
+        targetLabel: summary?.targetLabel
+      };
+    },
+
+    // Handle button click event to set the active category
+    setActive(categoryKey) {
+      this.fetchSummaryData(categoryKey);
+    }
+  }
+};
+</script>
+
+
+/////////////////////////
+
+<template>
+  <div>
+    <!-- Button List -->
+    <div class="d-flex gap-3">
+      <SummaryCardButton
+        v-for="(summary, index) in summaryTypes"
+        :key="index"
+        :summary="getSummaryData(summary.key)"
+        :activeButton="selectedSummary?.title"
+        @click="setActive(summary.key)"
+      />
+    </div>
+
+    <!-- Display Data of Selected Button -->
+    <div v-if="selectedSummary" class="mt-4 p-3 border rounded bg-light">
+      <h4 class="text-center">{{ selectedSummary.title }} Summary</h4>
+      <pre>{{ selectedData }}</pre> <!-- Display the filtered data as JSON -->
+    </div>
+  </div>
+</template>
+
+<script>
+import axios from 'axios'; // Import axios for API calls
+
+export default {
+  data() {
+    return {
+      mockData: [
+        { datetime: '2025-01-22 00:00', actual: 20035, plan: 30000 },
+        { datetime: '2025-01-22 01:00', actual: 23035, plan: 30000 },
+        // Mock data continues...
+      ],
+      selectedSummary: null,
+      selectedData: [],
+      summaryTypes: [
+        { title: 'Hourly', key: 'hourly', actualLabel: 'Actual Hourly to Date', targetLabel: 'Target Hourly' },
+        { title: 'Daily', key: 'daily', actualLabel: 'Actual Daily to Date', targetLabel: 'Target Daily' },
+        { title: 'Monthly', key: 'monthly', actualLabel: 'Actual Monthly to Date', targetLabel: 'Target Monthly' },
+        { title: 'Yearly', key: 'yearly', actualLabel: 'Actual Yearly to Date', targetLabel: 'Target Yearly' }
+      ],
+      useMockData: true, // Flag to switch between mock data and API calls
+    };
+  },
+  computed: {
+    // Function to calculate aggregated data for each category
+    aggregatedData() {
+      return {
+        hourly: this.calculateAggregatedData('hourly'),
+        daily: this.calculateAggregatedData('daily'),
+        monthly: this.calculateAggregatedData('monthly'),
+        yearly: this.calculateAggregatedData('yearly')
+      };
+    }
+  },
+  methods: {
+    // Function to calculate aggregated data for each category
+    calculateAggregatedData(category) {
+      let totalActual = 0;
+      let totalTarget = 0;
+
+      const filteredData = this.getFilteredData(category);
+
+      filteredData.forEach(item => {
+        totalActual += item.actual;
+        totalTarget += item.plan;
+      });
+
+      return {
+        actual: totalActual,
+        target: totalTarget
+      };
+    },
+
+    // Method to get filtered data based on the selected category
+    getFilteredData(category) {
+      if (this.useMockData) {
+        return this.mockData.filter(item => item.datetime.includes(category)); // Mock filter
+      } else {
+        return this.fetchDataFromAPI(category); // API call instead
+      }
+    },
+
+    // API call method to fetch data from Flask API
+    fetchDataFromAPI(category) {
+      let apiUrl = '';
+      switch (category) {
+        case 'hourly':
+          apiUrl = '/summary/hourly';
+          break;
+        case 'daily':
+          apiUrl = '/summary/daily';
+          break;
+        case 'monthly':
+          apiUrl = '/summary/monthly';
+          break;
+        case 'yearly':
+          apiUrl = '/summary/yearly';
+          break;
+        default:
+          return [];
+      }
+
+      return axios.get(apiUrl)
+        .then(response => response.data)
+        .catch(error => {
+          console.error('Error fetching data from API:', error);
+          return [];
+        });
+    },
+
+    // Function to get summary data based on category key
+    getSummaryData(categoryKey) {
+      return {
+        title: this.summaryTypes.find(type => type.key === categoryKey)?.title,
+        actualValue: this.aggregatedData[categoryKey].actual,
+        targetValue: this.aggregatedData[categoryKey].target,
+        actualLabel: this.summaryTypes.find(type => type.key === categoryKey)?.actualLabel,
+        targetLabel: this.summaryTypes.find(type => type.key === categoryKey)?.targetLabel
+      };
+    },
+
+    // Handle button click event to set the active category
+    setActive(categoryKey) {
+      this.selectedSummary = this.summaryTypes.find(type => type.key === categoryKey);
+      this.selectedData = this.getFilteredData(categoryKey);
+    }
+  }
+};
+</script>
+
+
+---
+
+from flask import Blueprint, jsonify
+from datetime import datetime
+from models import SummaryData
+
+summary_bp = Blueprint('summary', __name__)
+
+def filter_data(category):
+    current_date = datetime.now()
+    
+    if category == 'hourly':
+        current_hour = current_date.hour
+        return SummaryData.query.filter(SummaryData.datetime.like(f"{current_date.strftime('%Y-%m-%d')} {current_hour}%")).all()
+
+    elif category == 'daily':
+        current_date_str = current_date.strftime('%Y-%m-%d')
+        return SummaryData.query.filter(SummaryData.datetime.like(f"{current_date_str}%")).all()
+
+    elif category == 'monthly':
+        current_month = current_date.month
+        current_year = current_date.year
+        return SummaryData.query.filter(SummaryData.datetime.like(f"{current_year}-{current_month:02d}%")).all()
+
+    elif category == 'yearly':
+        current_year = current_date.year
+        return SummaryData.query.filter(SummaryData.datetime.like(f"{current_year}%")).all()
+
+    return []
+
+@summary_bp.route('/summary/hourly', methods=['GET'])
+def get_hourly_summary():
+    data = filter_data('hourly')
+    return jsonify([{
+        'datetime': item.datetime,
+        'actual': item.actual,
+        'plan': item.plan
+    } for item in data])
+
+@summary_bp.route('/summary/daily', methods=['GET'])
+def get_daily_summary():
+    data = filter_data('daily')
+    return jsonify([{
+        'datetime': item.datetime,
+        'actual': item.actual,
+        'plan': item.plan
+    } for item in data])
+
+@summary_bp.route('/summary/monthly', methods=['GET'])
+def get_monthly_summary():
+    data = filter_data('monthly')
+    return jsonify([{
+        'datetime': item.datetime,
+        'actual': item.actual,
+        'plan': item.plan
+    } for item in data])
+
+@summary_bp.route('/summary/yearly', methods=['GET'])
+def get_yearly_summary():
+    data = filter_data('yearly')
+    return jsonify([{
+        'datetime': item.datetime,
+        'actual': item.actual,
+        'plan': item.plan
+    } for item in data])
