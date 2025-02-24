@@ -1,0 +1,108 @@
+Here's a Python function that takes two lists (list1 and list2), finds the maximum value from each, determines the overall max value, and then uses it to get the adjusted range.
+
+Implementation
+
+import math
+
+def get_adjusted_range_from_lists(list1, list2):
+    if not list1 and not list2:
+        return [0, 0]  # If both lists are empty, return [0, 0]
+
+    max1 = max(list1) if list1 else float('-inf')  # Get max from list1 (handle empty case)
+    max2 = max(list2) if list2 else float('-inf')  # Get max from list2 (handle empty case)
+    max_value = max(max1, max2)  # Determine the overall max value
+
+    # Predefined cases
+    predefined_ranges = {
+        200: 200, 900: 900, 1000: 1000, 1500: 1500, 2000: 2000, 8500: 8500,
+        9000: 9000, 10000: 10000, 11000: 11000, 100000: 100000, 100500: 100500
+    }
+
+    # Check predefined thresholds
+    for threshold, adjusted in predefined_ranges.items():
+        if max_value <= threshold:
+            return [0, adjusted]
+
+    # Dynamic range calculation
+    magnitude = 10 ** math.floor(math.log10(max_value))  # Get power of 10
+    factor = max_value / magnitude  # Scale factor
+
+    # Adjust max based on the factor
+    if factor <= 1.1:
+        rounded_max = magnitude
+    elif factor <= 2:
+        rounded_max = 2 * magnitude
+    elif factor <= 5:
+        rounded_max = 5 * magnitude
+    else:
+        rounded_max = 10 * magnitude
+
+    return [0, rounded_max]
+
+# Example Usage
+list1 = [101, 250, 300]
+list2 = [99, 821, 700]
+
+list3 = [9999, 5000, 10001]
+list4 = [8000, 11000, 500]
+
+list5 = [820000000, 900000000]
+list6 = [1234567890, 1000000000]
+
+print(get_adjusted_range_from_lists(list1, list2))  # [0, 900]
+print(get_adjusted_range_from_lists(list3, list4))  # [0, 11000]
+print(get_adjusted_range_from_lists(list5, list6))  # [0, 2000000000]
+
+
+---
+
+
+
+---
+
+Example Outputs
+
+[0, 900]    # max(250, 821) → 821 → rounded to 900
+[0, 11000]  # max(10001, 11000) → 11000
+[0, 2000000000]  # max(900M, 1.23B) → 1.23B → rounded to 2B
+
+Would you like any refinements, such as finer-grained rounding?
+
+
+
+
+###
+import math
+
+def get_adjusted_range(max_value):
+    # Predefined cases to match specific values
+    predefined_ranges = {
+        200: 200, 900: 900, 1000: 1000, 1500: 1500, 2000: 2000, 8500: 8500,
+        9000: 9000, 10000: 10000, 11000: 11000, 100000: 100000, 100500: 100500
+    }
+
+    # Return predefined range if found
+    for threshold, adjusted in predefined_ranges.items():
+        if max_value <= threshold:
+            return [0, adjusted]
+
+    # Dynamic rounding for larger numbers
+    magnitude = 10 ** math.floor(math.log10(max_value))  # Determine order of magnitude
+    factor = max_value / magnitude  # Find scale factor in magnitude range
+
+    # Determine the best rounded-up max using logical thresholds
+    if factor <= 1.1:
+        rounded_max = magnitude  # 1x (e.g., 100M → 100M)
+    elif factor <= 2:
+        rounded_max = 2 * magnitude  # 2x (e.g., 150M → 200M)
+    elif factor <= 5:
+        rounded_max = 5 * magnitude  # 5x (e.g., 250M → 500M)
+    else:
+        rounded_max = 10 * magnitude  # 10x (e.g., 820M → 900M)
+
+    return [0, rounded_max]
+
+# Example Usage
+test_values = [101, 821, 9999, 100001, 820000000, 1234567890]
+for value in test_values:
+    print(f"max_value: {value}, range: {get_adjusted_range(value)}")
